@@ -21,8 +21,20 @@ const appRouter = createRouter()
         return next()
     })
     .query("hello", {
-        resolve: () => { return "Hello world!";}
-    });
+        resolve: ({ctx}) => { return `Hello ${ctx.user?ctx.user.name: "world"}!`;}
+    })
+    .merge("auth/" , 
+        createRouter()
+        .middleware(async ({ ctx, next }) => {
+            if (!ctx.user) {
+                throw new TRPCError({ code: 'UNAUTHORIZED' });
+            }
+            return next()
+        })
+        .query("ayklam", {
+            resolve: ({ctx}) => {return {user: ctx.user};}
+        })
+    );
 
 const app = express();
 const port = 8080;
