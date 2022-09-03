@@ -1,5 +1,6 @@
 import * as trpc from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
+import { prisma } from "../prisma/primsa-client";
 import { decodeAndVerifyJwtToken } from "./authentication/jwt";
 
 export async function createContext({
@@ -10,6 +11,7 @@ export async function createContext({
     // Will be available as `ctx` in all your resolvers
     // This is just an example of something you'd might want to do in your ctx fn
     async function getUserFromHeader() {
+        console.log(req.headers);
         if (req.headers.authorization) {
             const user = await decodeAndVerifyJwtToken(req.headers.authorization.split(' ')[1])
             return user;
@@ -19,6 +21,7 @@ export async function createContext({
     const user = await getUserFromHeader();
     return {
         user,
+        prisma 
     };
 }
 
