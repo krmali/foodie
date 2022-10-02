@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { t } from "i18next";
 import { ProcedureParserWithInputOutput } from "@trpc/server/dist/declarations/src/internals/procedure";
 
 export const LoginSchema: ProcedureParserWithInputOutput<
@@ -13,9 +12,9 @@ export const LoginSchema: ProcedureParserWithInputOutput<
         }> = z.object(
     {
         email: z.string()
-            .min(1, {message: t('nonEmptyEmailError')})
-            .email({message: t('invalidEmailError')}),
-        password: z.string().min(6, {message: t('shortPasswordError')})
+            .min(1, {message: 'nonEmptyEmailError' })
+            .email({message: 'invalidEmailError' }),
+        password: z.string().min(6, {message: 'shortPasswordError'})
     });
 
 export const SignUpSchema: z.ZodObject<{
@@ -32,8 +31,8 @@ export const SignUpSchema: z.ZodObject<{
             password: string;
         }> = z.object({
         email: z.string()
-            .min(1, {message: t('nonEmptyEmailError')})
-            .email({message: t('invalidEmailError')}),
-        name: z.string().max(100, {message: t('signup.invalidEmailError')}),
-        password: z.string().min(6, {message: t('shortPasswordError')})
+            .min(1, {message: 'nonEmptyEmailError'})
+            .email({message: 'invalidEmailError'}),
+        name: z.string().max(100, {message: 'signup.invalidEmailError'}),
+        password: z.string().min(6, {message: 'shortPasswordError'})
     })

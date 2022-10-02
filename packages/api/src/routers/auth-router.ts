@@ -16,14 +16,13 @@ export const AuthRouter = createRouter()
                     email : input.email.toLowerCase()
                 }
             });
-            console.log(ctx);
-            console.log(ctx.lng);
             if(!user){
-                throw new TRPCError({ code: 'UNAUTHORIZED' , message: t("invalidEmailError", { lng: ctx.lng})});
+                throw new TRPCError({ code: 'UNAUTHORIZED' , message: t("wrongCredentials", { lng: ctx.lng })});
             }
             else{
                 const isValidPassword = await checkValidPassword(input.password, user.password);
                 if(isValidPassword)return {accessToken : generateAccessToken(input.email.toLowerCase())};
+                else throw new TRPCError({ code: 'UNAUTHORIZED' , message: t("wrongCredentials", { lng: ctx.lng })});
             }
         }
     })
