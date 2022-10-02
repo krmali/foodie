@@ -1,6 +1,6 @@
 import * as trpc from "@trpc/server";
 import * as trpcNext from "@trpc/server/adapters/next";
-import { prisma } from "../prisma/primsa-client";
+import { ZodError } from "zod";
 import { decodeAndVerifyJwtToken } from "./authentication/jwt";
 
 export async function createContext({
@@ -31,5 +31,18 @@ export async function createContext({
 export type Context = trpc.inferAsyncReturnType<typeof createContext>;
 // Helper function to create a router with your app's context
 export function createRouter() {
-    return trpc.router<Context>();
+    return trpc.router<Context>()
+        .formatError(({shape, error}) => {
+            return {
+                ...shape,
+                data: {
+                    ...shape.data,
+                    zodError:
+                    error.cause instanceof ZodError
+                    ? error.cause.flatten()
+                    : null,
+                },
+            };
+        });
 }
+

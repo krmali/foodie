@@ -12,8 +12,8 @@ export const LoginSchema: ProcedureParserWithInputOutput<
         }> = z.object(
     {
         email: z.string()
-            .min(1, {message: 'nonEmptyEmailError' })
-            .email({message: 'invalidEmailError' }),
+            .min(1, { message: 'nonEmptyEmailError' })
+            .email({ message: 'invalidEmailError' }),
         password: z.string().min(6, {message: 'shortPasswordError'})
     });
 

@@ -35,7 +35,7 @@ export const AuthRouter = createRouter()
                 }
             });
             if(user){
-                throw new TRPCError({ code: 'UNAUTHORIZED' });
+                throw new TRPCError({ code: 'UNAUTHORIZED', message: t("userAlreadyExists", { lng: ctx.lng }) });
             }
             else{
                 const hashedPassword = await hashPassword(input.password);

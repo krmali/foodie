@@ -1,19 +1,30 @@
-import { Text, Box, Button, Center, FormControl, Heading, HStack, Input, Link, VStack } from "native-base";
-import { useState } from "react";
+import { Text, Box, Button, Center, FormControl, Heading, HStack, Input, Link, VStack, WarningOutlineIcon } from "native-base";
+import React, { useState } from "react";
 import { trpc } from "../../../trpc";
 import { AuthNavProps } from "../authParamList";
+import { StyleSheet } from "react-native";
 
 export const Login = ({navigation, route} : AuthNavProps<'Login'>) => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [fieldsErrors, setFieldsErrors] = useState<{
+            [x: string]: string[] | undefined;
+            [x: number]: string[] | undefined;
+            [x: symbol]: string[] | undefined;
+            } | undefined>({});
+
     const loginMutation = trpc.useMutation('auth/login');
 
     const login = () => {
-         
+        loginMutation.mutate({email: email, password: password});
+        if(loginMutation.error?.data){
+            let errs = loginMutation.error.data.zodError?.fieldErrors;
+            setFieldsErrors(errs);
+        }
     }
   
   return <Center w="100%">
-      <Bmx safeArea p="2" py="8" w="90%" maxW="290">
+      <Box safeArea p="2" py="8" w="90%" maxW="290">
         <Heading size="lg" fontWeight="600" color="coolGray.800" _dark={{
         color: "warmGray.50"
       }}>
@@ -24,15 +35,22 @@ export const Login = ({navigation, route} : AuthNavProps<'Login'>) => {
       }} color="coolGray.600" fontWeight="medium" size="xs">
           Sign in to continue!
         </Heading>
+        <Text>{JSON.stringify(fieldsErrors)}</Text>
 
         <VStack space={3} mt="5">
-          <FormControl>
+          <FormControl isInvalid={ fieldsErrors && fieldsErrors.email && true}>
             <FormControl.Label>Email ID</FormControl.Label>
             <Input onChangeText={value => setEmail(value)}/>
+            <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" /> }>
+              Atleast 6 characters are required.
+            </FormControl.ErrorMessage>
           </FormControl>
-          <FormControl>
+          <FormControl isInvalid={ fieldsErrors && fieldsErrors.password && true}>
             <FormControl.Label>Password</FormControl.Label>
-            <Input type="password" />
+            <Input type="password" onChangeText={value => setPassword(value)}/>
+            <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" /> }>
+              Atleast 6 characters are required.
+            </FormControl.ErrorMessage>
             <Link _text={{
             fontSize: "xs",
             fontWeight: "500",
@@ -41,7 +59,9 @@ export const Login = ({navigation, route} : AuthNavProps<'Login'>) => {
               Forget Password?
             </Link>
           </FormControl>
-          <Button mt="2" colorScheme="indigo" onPress={login}>
+          <Button mt="2" colorScheme="indigo" 
+                disabled={loginMutation.isLoading}
+                onPress={login}>
             Sign in
           </Button>
           <HStack mt="6" justifyContent="center">

@@ -5,6 +5,7 @@ import cors from "cors";
 import i18next, { t } from "i18next";
 import { i18nInit } from "./i18n/i18next";
 import * as i18nextMiddlewhere from "i18next-http-middleware";
+import { createContext } from "vm";
 
 const appRouter = trpc.router()
     .query("hello", {
@@ -24,7 +25,7 @@ app.use(
     "/trpc",
     trpcExpress.createExpressMiddleware({
         router: appRouter,
-        createContext
+        createContext: createContext
         // createContext: () => null
     })
 );

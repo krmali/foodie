@@ -3,7 +3,7 @@ import { arTranslations } from "./ar";
 import { enTranslations } from "./en";
 
 export const i18nInit = {
-    debug: true,
+    // debug: true,
     fallbackLng: 'en',
     resources: {
         en: enTranslations,
