@@ -10,6 +10,13 @@ export async function createContext({
     // Create your context based on the request object
     // Will be available as `ctx` in all your resolvers
     // This is just an example of something you'd might want to do in your ctx fn
+
+    console.log("-------------------------------------------------");
+    console.log("-------------------------------------------------");
+    console.log(req.language);
+    console.log(req.languages);
+    console.log("-------------------------------------------------");
+    console.log("-------------------------------------------------");
     async function getUserFromHeader() {
         console.log(req.headers);
         if (req.headers.authorization) {
@@ -18,10 +25,12 @@ export async function createContext({
         }
         return null;
     }
+
     const user = await getUserFromHeader();
+    const lng: string = req.language;
     return {
         user,
-        prisma 
+        lng
     };
 }
 

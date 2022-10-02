@@ -3,21 +3,23 @@ import { z } from "zod";
 import { checkValidPassword, hashPassword } from "../authentication/hash";
 import { generateAccessToken } from "../authentication/jwt";
 import { createRouter } from "../context";
+import { prisma } from "../../prisma/primsa-client";
+import { LoginSchema, SignUpSchema } from "../../zodSchemas/auth";
+import { t } from "i18next";
 
 export const AuthRouter = createRouter()
     .mutation("login",{ 
-        input: z.object({
-            email: z.string().email(),
-            password: z.string().min(6)
-        }),
+        input: LoginSchema,
         resolve: async ({ctx, input}) => {
-            const user = await ctx.prisma.user.findFirst({
+            const user = await prisma.user.findFirst({
                 where: {
                     email : input.email.toLowerCase()
                 }
             });
+            console.log(ctx);
+            console.log(ctx.lng);
             if(!user){
-                throw new TRPCError({ code: 'UNAUTHORIZED' });
+                throw new TRPCError({ code: 'UNAUTHORIZED' , message: t("invalidEmailError", { lng: ctx.lng})});
             }
             else{
                 const isValidPassword = await checkValidPassword(input.password, user.password);
@@ -26,13 +28,9 @@ export const AuthRouter = createRouter()
         }
     })
     .mutation("sign-up",{ 
-        input: z.object({
-            email: z.string().email(),
-            name: z.string().max(100),
-            password: z.string().min(6)
-        }),
+        input: SignUpSchema,
         resolve: async ({ctx, input}) => {
-            const user = await ctx.prisma.user.findFirst({
+            const user = await prisma.user.findFirst({
                 where: {
                     email : input.email.toLowerCase()
                 }
@@ -42,14 +40,13 @@ export const AuthRouter = createRouter()
             }
             else{
                 const hashedPassword = await hashPassword(input.password);
-                await ctx.prisma.user.create(
+                await prisma.user.create(
                     { data:
                         {
                             email: input.email,
                             name: input.name,
                             password: hashedPassword,
                         }
-
                 });
                 return {accessToken : generateAccessToken(input.email.toLowerCase())};
             }

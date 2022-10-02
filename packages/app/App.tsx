@@ -15,7 +15,9 @@ import {
 import NativeBaseIcon from "./components/NativeBaseIcon";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { trpc } from "./trpc";
-
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { AuthStack } from "./stacks/authStack/authStack";
 
 // Define the config
 const config = {
@@ -42,23 +44,23 @@ export default function App(){
     return(
         <trpc.Provider client={trpcClient} queryClient={client}>
             <QueryClientProvider client={client}>
-                <AppContent></AppContent>
+                    <AppContent></AppContent>
             </QueryClientProvider>
         </trpc.Provider>
     );
 }
 
+const Stack = createNativeStackNavigator();
+
 function AppContent() {
-    const hello = trpc.useQuery(["hello"]);
+    {/* const hello = trpc.useQuery(["hello"]); */}
+    const hello = trpc.useQuery(['hello']);
     return(
-        <>
         <NativeBaseProvider>
-            <Center>
-            <Text>djkfadklsjfkjsd ksdjf</Text>
-            <Text>{JSON.stringify(hello.data)}</Text>
-        </Center>
+            <NavigationContainer>
+                <AuthStack/>
+            </NavigationContainer>
         </NativeBaseProvider>
-        </>
 
     );
 }
