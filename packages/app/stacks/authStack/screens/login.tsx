@@ -2,25 +2,35 @@ import { Text, Box, Button, Center, FormControl, Heading, HStack, Input, Link, V
 import React, { useState } from "react";
 import { trpc } from "../../../trpc";
 import { AuthNavProps } from "../authParamList";
-import { StyleSheet } from "react-native";
+import { StyleSheet, I18nManager as RNI18nManager } from "react-native";
+import * as Updates from "expo-updates";
+import { useTranslation } from "react-i18next";
+
+type FieldErrors = {
+                [x: string]: string[] | undefined;
+                [x: number]: string[] | undefined;
+                [x: symbol]: string[] | undefined;
+            } | undefined;
 
 export const Login = ({navigation, route} : AuthNavProps<'Login'>) => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [fieldsErrors, setFieldsErrors] = useState<{
-            [x: string]: string[] | undefined;
-            [x: number]: string[] | undefined;
-            [x: symbol]: string[] | undefined;
-            } | undefined>({});
+    const [fieldsErrors, setFieldsErrors] = useState<FieldErrors>({});
+    const { t } = useTranslation();
 
     const loginMutation = trpc.useMutation('auth/login');
 
-    const login = () => {
+    const login = async () => {
         loginMutation.mutate({email: email, password: password});
         if(loginMutation.error?.data){
             let errs = loginMutation.error.data.zodError?.fieldErrors;
             setFieldsErrors(errs);
         }
+        {/* RNI18nManager.allowRTL(true); */}
+        {/* RNI18nManager.forceRTL(true); */}
+        {/* await Updates.reloadAsync(); */}
+        {/* setEmail(RNI18nManager.isRTL? "rtl" : "ltr"); */}
+
     }
   
   return <Center w="100%">

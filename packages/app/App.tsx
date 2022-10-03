@@ -18,6 +18,7 @@ import { trpc } from "./trpc";
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthStack } from "./stacks/authStack/authStack";
+import './i18n';
 
 // Define the config
 const config = {
