@@ -37,9 +37,9 @@ export function createRouter() {
                 ...shape,
                 data: {
                     ...shape.data,
-                    zodError:
+                    zodErrors:
                     error.cause instanceof ZodError
-                    ? error.cause.flatten()
+                    ? error.cause.flatten().fieldErrors
                     : null,
                 },
             };

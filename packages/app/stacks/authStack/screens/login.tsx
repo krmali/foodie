@@ -2,7 +2,7 @@ import { Text, Box, Button, Center, FormControl, Heading, HStack, Input, Link, V
 import React, { useState } from "react";
 import { trpc } from "../../../trpc";
 import { AuthNavProps } from "../authParamList";
-import { StyleSheet, I18nManager as RNI18nManager } from "react-native";
+import { StyleSheet, I18nManager as RNI18nManager, AsyncStorage } from "react-native";
 import * as Updates from "expo-updates";
 import { useTranslation } from "react-i18next";
 
@@ -15,22 +15,52 @@ type FieldErrors = {
 export const Login = ({navigation, route} : AuthNavProps<'Login'>) => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
-    const [fieldsErrors, setFieldsErrors] = useState<FieldErrors>({});
     const { t } = useTranslation();
 
     const loginMutation = trpc.useMutation('auth/login');
 
     const login = async () => {
         loginMutation.mutate({email: email, password: password});
-        if(loginMutation.error?.data){
-            let errs = loginMutation.error.data.zodError?.fieldErrors;
-            setFieldsErrors(errs);
-        }
-        {/* RNI18nManager.allowRTL(true); */}
-        {/* RNI18nManager.forceRTL(true); */}
-        {/* await Updates.reloadAsync(); */}
-        {/* setEmail(RNI18nManager.isRTL? "rtl" : "ltr"); */}
+        console.log("---------------------------------------------------");
+        console.log("---------------------------------------------------");
+        console.log(loginMutation);
+        console.log("---------------------------------------------------");
+        console.log("---------------------------------------------------");
+        {/* if(loginMutation.error?.data){ */}
+        {/*     let errs = loginMutation.error.data.zodErrors; */}
+            {/* setFieldsErrors(errs); */}
+            {/* console.log(errs); */}
+            //}
 
+        {/*  AsyncStorage.clear(); */}
+        {/* RNI18nManager.allowRTL(true); */}
+        {/* RNI18nManager.forceRTL(false); */}
+        {/* await Updates.reloadAsync(); */}
+
+    }
+
+    const getEmailErrors = () => {
+        let emailErrors = loginMutation.error 
+            && loginMutation.error.data
+            && loginMutation.error.data.zodErrors
+            && loginMutation.error.data.zodErrors.email;
+        if(emailErrors){
+            return emailErrors;
+        }
+        return [];
+    }
+
+    const getPasswordErrors = () => {
+        let passwordErrors = loginMutation.error 
+            && loginMutation.error.data
+            && loginMutation.error.data.zodErrors
+            && loginMutation.error.data.zodErrors.password;
+        if(passwordErrors){
+            console.log("will return ", passwordErrors);
+            return passwordErrors;
+        }
+            console.log("will return ",[]);
+        return [];
     }
   
   return <Center w="100%">
@@ -42,24 +72,25 @@ export const Login = ({navigation, route} : AuthNavProps<'Login'>) => {
         </Heading>
         <Heading mt="1" _dark={{
         color: "warmGray.200"
-      }} color="coolGray.600" fontWeight="medium" size="xs">
+        }} color="coolGray.600" fontWeight="medium" size="xs">
           Sign in to continue!
         </Heading>
-        <Text>{JSON.stringify(fieldsErrors)}</Text>
+        <Text>{RNI18nManager.isRTL? "rtl" : "ltr"}</Text>
+        <Text>{JSON.stringify(loginMutation.error?.data?.zodErrors)}</Text>
 
         <VStack space={3} mt="5">
-          <FormControl isInvalid={ fieldsErrors && fieldsErrors.email && true}>
-            <FormControl.Label>Email ID</FormControl.Label>
+            <FormControl isInvalid={ getEmailErrors().length > 0 }>
+            <FormControl.Label>Email</FormControl.Label>
             <Input onChangeText={value => setEmail(value)}/>
             <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" /> }>
-              Atleast 6 characters are required.
+                { t(getEmailErrors()[0]) }
             </FormControl.ErrorMessage>
           </FormControl>
-          <FormControl isInvalid={ fieldsErrors && fieldsErrors.password && true}>
+          <FormControl isInvalid={ getPasswordErrors().length > 0  }>
             <FormControl.Label>Password</FormControl.Label>
             <Input type="password" onChangeText={value => setPassword(value)}/>
             <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" /> }>
-              Atleast 6 characters are required.
+                { t(getPasswordErrors()[0]) }
             </FormControl.ErrorMessage>
             <Link _text={{
             fontSize: "xs",

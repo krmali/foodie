@@ -1,9 +1,10 @@
-import i18next, { TFunction } from "i18next";
+import i18next, { InitOptions, TFunction } from "i18next";
 import { arTranslations } from "./ar";
 import { enTranslations } from "./en";
 
-export const i18nInit = {
+export const i18nInit : InitOptions = {
     // debug: true,
+    compatibilityJSON: 'v3',
     fallbackLng: 'en',
     resources: {
         en: enTranslations,
